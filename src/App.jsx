@@ -72,13 +72,65 @@ const pricing = [
   },
 ];
 
+// Modal Component
+function Modal({ isOpen, title, children, onClose }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="relative max-w-md w-full mx-4 rounded-2xl border border-white/10 bg-slate-900 p-8 shadow-2xl">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-slate-400 hover:text-white transition"
+        >
+          ✕
+        </button>
+        <h2 className="text-2xl font-bold text-white mb-4">{title}</h2>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const portfolioData = usePortfolioData();
   const agentStatus = useAgentStatus();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showDemoModal, setShowDemoModal] = useState(false);
+  const [showPricingModal, setShowPricingModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
 
   const portfolio = portfolioData.data || {};
   const agents_status = agentStatus.data || {};
+
+  // Navigation functions
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  // Sign in handler
+  const handleSignIn = () => {
+    setShowAuthModal(true);
+  };
+
+  // Get started handler
+  const handleGetStarted = () => {
+    setShowPricingModal(true);
+  };
+
+  // Demo booking handler
+  const handleBookDemo = () => {
+    setShowDemoModal(true);
+  };
+
+  // Pricing plan selection
+  const handleSelectPlan = (planName) => {
+    setSelectedPlan(planName);
+  };
 
   return (
     <div className="min-h-screen bg-[#07111f] text-slate-100">
@@ -94,17 +146,23 @@ export default function App() {
           </div>
 
           <div className="hidden items-center gap-8 text-sm text-slate-300 md:flex">
-            <a href="#agents" className="hover:text-cyan-300 transition">Agents</a>
-            <a href="#platform" className="hover:text-cyan-300 transition">Platform</a>
-            <a href="#research" className="hover:text-cyan-300 transition">Research</a>
-            <a href="#pricing" className="hover:text-cyan-300 transition">Pricing</a>
+            <button onClick={() => scrollToSection("agents")} className="hover:text-cyan-300 transition cursor-pointer">Agents</button>
+            <button onClick={() => scrollToSection("platform")} className="hover:text-cyan-300 transition cursor-pointer">Platform</button>
+            <button onClick={() => scrollToSection("research")} className="hover:text-cyan-300 transition cursor-pointer">Research</button>
+            <button onClick={() => scrollToSection("pricing")} className="hover:text-cyan-300 transition cursor-pointer">Pricing</button>
           </div>
 
           <div className="flex items-center gap-3">
-            <button className="hidden rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 hover:bg-white/5 transition md:inline-block">
+            <button 
+              onClick={handleSignIn}
+              className="hidden rounded-full border border-white/10 px-4 py-2 text-sm text-slate-200 hover:bg-white/5 transition md:inline-block"
+            >
               Sign in
             </button>
-            <button className="rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-5 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 transition">
+            <button 
+              onClick={handleGetStarted}
+              className="rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-5 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 transition"
+            >
               Get started
             </button>
           </div>
@@ -129,10 +187,16 @@ export default function App() {
               </p>
 
               <div className="mt-8 flex flex-wrap gap-4">
-                <button className="rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-6 py-3 font-semibold text-slate-950 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 transition">
+                <button 
+                  onClick={handleGetStarted}
+                  className="rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-6 py-3 font-semibold text-slate-950 shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 transition"
+                >
                   Start free
                 </button>
-                <button className="rounded-full border border-white/15 bg-white/5 px-6 py-3 font-semibold text-white backdrop-blur-sm hover:bg-white/10 transition">
+                <button 
+                  onClick={handleBookDemo}
+                  className="rounded-full border border-white/15 bg-white/5 px-6 py-3 font-semibold text-white backdrop-blur-sm hover:bg-white/10 transition"
+                >
                   Book demo
                 </button>
               </div>
@@ -352,6 +416,7 @@ export default function App() {
                 <p className="mt-4 text-sm leading-7 text-slate-300">{plan.desc}</p>
 
                 <button
+                  onClick={() => handleSelectPlan(plan.name)}
                   className={`mt-8 w-full rounded-full px-5 py-3 font-semibold transition ${
                     plan.featured
                       ? "bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 hover:shadow-lg hover:shadow-cyan-500/30"
@@ -374,16 +439,146 @@ export default function App() {
             </p>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-              <button className="rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-6 py-3 font-semibold text-slate-950 hover:shadow-lg hover:shadow-cyan-500/30 transition">
+              <button 
+                onClick={handleGetStarted}
+                className="rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-6 py-3 font-semibold text-slate-950 hover:shadow-lg hover:shadow-cyan-500/30 transition"
+              >
                 Try free
               </button>
-              <button className="rounded-full border border-white/15 bg-white/5 px-6 py-3 font-semibold text-white hover:bg-white/10 transition">
+              <button 
+                onClick={handleBookDemo}
+                className="rounded-full border border-white/15 bg-white/5 px-6 py-3 font-semibold text-white hover:bg-white/10 transition"
+              >
                 Talk to an expert
               </button>
             </div>
           </div>
         </section>
       </main>
+
+      {/* Modals */}
+      <Modal 
+        isOpen={showAuthModal} 
+        title="Sign in to QuantAI" 
+        onClose={() => setShowAuthModal(false)}
+      >
+        <form className="space-y-4">
+          <div>
+            <label className="block text-sm text-slate-300 mb-2">Email</label>
+            <input 
+              type="email" 
+              className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-white/10 text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400"
+              placeholder="you@example.com"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-slate-300 mb-2">Password</label>
+            <input 
+              type="password" 
+              className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-white/10 text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400"
+              placeholder="••••••••"
+            />
+          </div>
+          <button 
+            type="submit"
+            className="w-full mt-6 bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-semibold py-2 rounded-lg hover:shadow-lg hover:shadow-cyan-500/30 transition"
+          >
+            Sign in
+          </button>
+        </form>
+      </Modal>
+
+      <Modal 
+        isOpen={showDemoModal} 
+        title="Book a Demo" 
+        onClose={() => setShowDemoModal(false)}
+      >
+        <form className="space-y-4">
+          <div>
+            <label className="block text-sm text-slate-300 mb-2">Full Name</label>
+            <input 
+              type="text" 
+              className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-white/10 text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400"
+              placeholder="Your name"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-slate-300 mb-2">Email</label>
+            <input 
+              type="email" 
+              className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-white/10 text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400"
+              placeholder="you@company.com"
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-slate-300 mb-2">Company</label>
+            <input 
+              type="text" 
+              className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-white/10 text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400"
+              placeholder="Your company"
+            />
+          </div>
+          <button 
+            type="submit"
+            className="w-full mt-6 bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-semibold py-2 rounded-lg hover:shadow-lg hover:shadow-cyan-500/30 transition"
+          >
+            Request Demo
+          </button>
+        </form>
+      </Modal>
+
+      <Modal 
+        isOpen={showPricingModal} 
+        title={selectedPlan ? `Selected: ${selectedPlan}` : "Choose Your Plan"} 
+        onClose={() => {
+          setShowPricingModal(false);
+          setSelectedPlan(null);
+        }}
+      >
+        {selectedPlan ? (
+          <div className="space-y-4">
+            <p className="text-slate-300">
+              You've selected the <span className="font-bold text-cyan-300">{selectedPlan}</span> plan.
+            </p>
+            <p className="text-sm text-slate-400">
+              Enter your email to get started with your free trial.
+            </p>
+            <input 
+              type="email" 
+              className="w-full px-4 py-2 rounded-lg bg-slate-800 border border-white/10 text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400"
+              placeholder="you@example.com"
+            />
+            <button 
+              className="w-full mt-4 bg-gradient-to-r from-cyan-400 to-blue-500 text-slate-950 font-semibold py-2 rounded-lg hover:shadow-lg hover:shadow-cyan-500/30 transition"
+            >
+              Start Free Trial
+            </button>
+            <button 
+              onClick={() => setSelectedPlan(null)}
+              className="w-full border border-white/15 text-white py-2 rounded-lg hover:bg-white/5 transition"
+            >
+              Back to Plans
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-3 max-h-64 overflow-y-auto">
+            {pricing.map((plan) => (
+              <button
+                key={plan.name}
+                onClick={() => setSelectedPlan(plan.name)}
+                className={`w-full p-4 rounded-lg text-left transition border ${
+                  plan.featured
+                    ? "border-cyan-400/40 bg-cyan-400/10 hover:bg-cyan-400/20"
+                    : "border-white/10 bg-white/5 hover:bg-white/10"
+                }`}
+              >
+                <div className="font-bold text-white">{plan.name}</div>
+                <div className="text-sm text-slate-300">{plan.price}</div>
+              </button>
+            ))}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
