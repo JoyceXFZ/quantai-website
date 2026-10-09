@@ -58,13 +58,83 @@ const metrics = [
   { label: "Clients Active", value: "1,200+" },
 ];
 
+const strategyLibrary = [
+  {
+    title: "Trend Following",
+    type: "Systematic",
+    description: "Captures momentum across equities, futures, and macro markets by following persistent directional moves.",
+    tags: ["Momentum", "Macro", "Cross-Asset"],
+    metrics: [
+      { label: "Sharpe", value: "2.4" },
+      { label: "Max Drawdown", value: "-8.1%" },
+      { label: "Signal Window", value: "1-30d" },
+    ],
+  },
+  {
+    title: "Mean Reversion",
+    type: "Statistical Arbitrage",
+    description: "Identifies temporary dislocations relative to established pricing ranges and reversion bands.",
+    tags: ["Pairs", "Relative Value", "Volatility"],
+    metrics: [
+      { label: "Sharpe", value: "1.9" },
+      { label: "Win Rate", value: "61%" },
+      { label: "Signal Window", value: "1-10d" },
+    ],
+  },
+  {
+    title: "Macro Strategy",
+    type: "Macro",
+    description: "Uses rates, inflation, policy, and geopolitical signals to position across currencies, rates, and commodities.",
+    tags: ["Rates", "FX", "Macro"],
+    metrics: [
+      { label: "Sharpe", value: "2.1" },
+      { label: "IR Sensitivity", value: "High" },
+      { label: "Signal Window", value: "1-90d" },
+    ],
+  },
+  {
+    title: "Market Neutral",
+    type: "Long/Short Equity",
+    description: "Pairs long and short exposure to reduce beta while isolating idiosyncratic factor opportunities.",
+    tags: ["Beta Neutral", "Factor", "Equity"],
+    metrics: [
+      { label: "Beta", value: "0.2" },
+      { label: "Hit Rate", value: "57%" },
+      { label: "Signal Window", value: "1-30d" },
+    ],
+  },
+  {
+    title: "Event-Driven",
+    type: "Fundamental",
+    description: "Monitors earnings, M&A, restructuring, and catalyst events to exploit transient pricing inefficiencies.",
+    tags: ["Catalysts", "Corporate Actions", "Volatility"],
+    metrics: [
+      { label: "Portfolio Beta", value: "0.7" },
+      { label: "Average Hold", value: "2-6w" },
+      { label: "Conviction", value: "High" },
+    ],
+  },
+  {
+    title: "Multi-Strategy",
+    type: "Platform",
+    description: "Combines multiple research pods and execution styles to diversify risk while maximizing opportunity capture.",
+    tags: ["Diversified", "Risk Parity", "Platform"],
+    metrics: [
+      { label: "Diversification", value: "High" },
+      { label: "Correlation", value: "Low" },
+      { label: "Alpha Source", value: "Multiple" },
+    ],
+  },
+];
+
 export default function App() {
   const [selectedAgent, setSelectedAgent] = useState(agents[0]);
   const [showSignupModal, setShowSignupModal] = useState(false);
 
+  const isStrategyTab = selectedAgent.id === "strategy";
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
-      {/* Header */}
       <header className="border-b border-white/10 bg-slate-900/50 backdrop-blur">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -88,7 +158,6 @@ export default function App() {
       </header>
 
       <div className="flex h-[calc(100vh-73px)]">
-        {/* Left Sidebar - Agent Selection */}
         <div className="w-24 border-r border-white/10 bg-slate-950/50 backdrop-blur flex flex-col items-center py-6 gap-4">
           <div className="text-xs text-slate-400 font-semibold mb-2">AGENTS</div>
           {agents.map((agent) => (
@@ -110,10 +179,8 @@ export default function App() {
           ))}
         </div>
 
-        {/* Main Content */}
         <div className="flex-1 overflow-auto">
           <div className="max-w-5xl mx-auto p-8">
-            {/* Agent Hero */}
             <div className="mb-12">
               <div className="flex items-center gap-4 mb-6">
                 <div className="text-6xl">{selectedAgent.icon}</div>
@@ -131,20 +198,80 @@ export default function App() {
               </button>
             </div>
 
-            {/* Stats Grid */}
-            <div className="grid md:grid-cols-3 gap-4 mb-16">
-              {selectedAgent.stats.map((stat, i) => (
-                <div
-                  key={i}
-                  className="bg-white/5 border border-white/10 rounded-xl p-6 hover:border-cyan-400/30 transition"
-                >
-                  <p className="text-slate-400 text-sm mb-2">{stat.label}</p>
-                  <p className="text-3xl font-black text-cyan-400">{stat.value}</p>
+            {isStrategyTab ? (
+              <>
+                <div className="grid md:grid-cols-3 gap-4 mb-10">
+                  {selectedAgent.stats.map((stat, i) => (
+                    <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-5">
+                      <p className="text-slate-400 text-sm mb-1">{stat.label}</p>
+                      <p className="text-2xl font-black text-cyan-400">{stat.value}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            {/* Key Metrics */}
+                <div className="mb-10">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold">Strategy Library</h2>
+                    <button className="text-cyan-400 text-sm font-medium">View all</button>
+                  </div>
+
+                  <div className="grid gap-5 md:grid-cols-2">
+                    {strategyLibrary.map((strategy, index) => (
+                      <div key={index} className="bg-white/5 border border-white/10 rounded-2xl p-5 hover:border-cyan-400/40 transition">
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="text-xl font-bold text-white">{strategy.title}</h3>
+                          <span className="text-xs uppercase tracking-[0.2em] text-cyan-300">{strategy.type}</span>
+                        </div>
+                        <p className="text-slate-300 text-sm leading-6 mb-4">{strategy.description}</p>
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {strategy.tags.map((tag) => (
+                            <span key={tag} className="px-2 py-1 rounded-full bg-cyan-500/10 text-cyan-300 text-xs border border-cyan-400/20">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/10">
+                          {strategy.metrics.map((metric) => (
+                            <div key={metric.label}>
+                              <div className="text-[10px] uppercase tracking-[0.2em] text-slate-400">{metric.label}</div>
+                              <div className="mt-1 text-sm font-bold text-white">{metric.value}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-400/20 rounded-2xl p-8 mb-10">
+                  <h2 className="text-2xl font-bold mb-4">Strategy Stack</h2>
+                  <div className="grid md:grid-cols-3 gap-4">
+                    {[
+                      { label: "Factor Modeling", value: "Live" },
+                      { label: "Signal Fusion", value: "Multi-model" },
+                      { label: "Execution Layer", value: "Adaptive" },
+                    ].map((item) => (
+                      <div key={item.label} className="bg-slate-900/60 border border-white/10 rounded-xl p-4">
+                        <p className="text-slate-400 text-xs mb-1 uppercase tracking-[0.2em]">{item.label}</p>
+                        <p className="text-lg font-bold text-white">{item.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="grid md:grid-cols-3 gap-4 mb-16">
+                  {selectedAgent.stats.map((stat, i) => (
+                    <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-6 hover:border-cyan-400/30 transition">
+                      <p className="text-slate-400 text-sm mb-2">{stat.label}</p>
+                      <p className="text-3xl font-black text-cyan-400">{stat.value}</p>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
             <div className="mb-16">
               <h2 className="text-2xl font-bold mb-6">Platform Metrics</h2>
               <div className="grid md:grid-cols-4 gap-4">
@@ -157,7 +284,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* How It Works */}
             <div className="mb-16">
               <h2 className="text-2xl font-bold mb-6">How {selectedAgent.title} Works</h2>
               <div className="space-y-4">
@@ -177,7 +303,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Pricing Preview */}
             <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-400/20 rounded-2xl p-8 mb-16">
               <h2 className="text-2xl font-bold mb-4">Ready to get started?</h2>
               <p className="text-slate-300 mb-6">
@@ -195,18 +320,10 @@ export default function App() {
                   </button>
                 </div>
                 <div className="text-sm text-slate-300 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-cyan-400">✓</span> Unlimited signal access
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-cyan-400">✓</span> Real-time alerts
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-cyan-400">✓</span> API access
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-cyan-400">✓</span> 24/7 support
-                  </div>
+                  <div className="flex items-center gap-2"><span className="text-cyan-400">✓</span> Unlimited signal access</div>
+                  <div className="flex items-center gap-2"><span className="text-cyan-400">✓</span> Real-time alerts</div>
+                  <div className="flex items-center gap-2"><span className="text-cyan-400">✓</span> API access</div>
+                  <div className="flex items-center gap-2"><span className="text-cyan-400">✓</span> 24/7 support</div>
                 </div>
               </div>
             </div>
@@ -214,10 +331,9 @@ export default function App() {
         </div>
       </div>
 
-      {/* Signup Modal */}
       {showSignupModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-slate-900 border border-white/10 rounded-2xl p-8 max-w-md w-full mx-4">
+          <div className="bg-slate-900 border border-white/10 rounded-2xl p-8 max-w-md w-full mx-4 relative">
             <button
               onClick={() => setShowSignupModal(false)}
               className="absolute top-4 right-4 text-slate-400 hover:text-white text-2xl"
